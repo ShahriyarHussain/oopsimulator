@@ -34,38 +34,38 @@ public class RASimController {
         return ResponseEntity.ok(raSimulatorService.getOperationResult(operationDto));
     }
 
-    @GetMapping("/rename")
+    @PostMapping("/rename")
     public ResponseEntity<ResponseDto> getRenamedData(@RequestBody RenameDto renameDto) throws SQLException {
         return ResponseEntity.ok(raSimulatorService.alterColumnName(renameDto));
     }
 
     @GetMapping("/crossProduct")
-    public String getCrossProductData() {
-        return null;
+    public ResponseEntity<List<Map<String, String>>> getCrossProductData(@RequestBody JoinRequestDto joinRequestDto) {
+        return ResponseEntity.ok(raSimulatorService.getCrossProductResult(joinRequestDto));
     }
 
     @GetMapping("/thetaJoin")
-    public String getThetaJoinData() {
-        return null;
+    public ResponseEntity<List<Map<String, String>>> getThetaJoinData(@RequestBody JoinRequestDto joinRequestDto) {
+        return ResponseEntity.ok(raSimulatorService.getThetaJoinResult(joinRequestDto));
     }
 
     @GetMapping("/naturalJoin")
-    public String getNaturalJoinData() {
-        return null;
+    public ResponseEntity<List<Map<String, String>>> getNaturalJoinData(@RequestBody JoinRequestDto joinRequestDto) {
+        return ResponseEntity.ok(raSimulatorService.getNaturalJoinResults(joinRequestDto));
     }
 
     @GetMapping("/leftOuterJoin")
-    public String getLeftOuterJoinData() {
-        return null;
+    public ResponseEntity<List<Map<String, String>>> getLeftOuterJoinData(@RequestBody JoinRequestDto joinRequestDto) {
+        return ResponseEntity.ok(raSimulatorService.getLeftOuterJoinResults(joinRequestDto));
     }
 
     @GetMapping("/rightOuterJoin")
-    public String getRightOuterJoinData() {
-        return null;
+    public ResponseEntity<List<Map<String, String>>> getRightOuterJoinData(@RequestBody JoinRequestDto joinRequestDto) {
+        return ResponseEntity.ok(raSimulatorService.getRightOuterJoinResults(joinRequestDto));
     }
 
     @GetMapping("/rightFullJoin")
-    public String getRightFullJoinData() {
-        return null;
+    public ResponseEntity<List<Map<String, String>>> getRightFullJoinData(@RequestBody JoinRequestDto joinRequestDto) {
+        return ResponseEntity.ok(raSimulatorService.getRightFullJoinResults(joinRequestDto));
     }
 }

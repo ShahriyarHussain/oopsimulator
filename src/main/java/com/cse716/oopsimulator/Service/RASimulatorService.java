@@ -9,10 +9,7 @@ import org.springframework.stereotype.Service;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -121,7 +118,7 @@ public class RASimulatorService {
         query.append("ALTER TABLE ").append(renameDto.getTableName()).append(" RENAME ")
                 .append(renameDto.getColumnName()).append(" TO ").append(renameDto.getNewColumnName());
         System.out.println(query);
-        try(Connection connection = dataSource.getConnection()) {
+        try (Connection connection = dataSource.getConnection()) {
             preparedStatement = connection.prepareStatement(query.toString());
             preparedStatement.execute();
             preparedStatement.close();
@@ -134,14 +131,87 @@ public class RASimulatorService {
         return new ResponseDto("Success!");
     }
 
-    public List<Object[]> getCrossProductResult(JoinRequestDto joinRequestDto) {
+    public List<Map<String, String>> getCrossProductResult(JoinRequestDto joinRequestDto) {
+        return getResultMapList(joinRequestDto);
+    }
 
+    public List<Map<String, String>> getThetaJoinResult(JoinRequestDto joinRequestDto) {
+        return getResultMapList(joinRequestDto);
+    }
+
+    public List<Map<String, String>> getNaturalJoinResults(JoinRequestDto joinRequestDto) {
+        return getResultMapList(joinRequestDto);
+    }
+
+    public List<Map<String, String>> getLeftOuterJoinResults(JoinRequestDto joinRequestDto) {
+        return getResultMapList(joinRequestDto);
+    }
+
+    public List<Map<String, String>> getRightOuterJoinResults(JoinRequestDto joinRequestDto) {
+        return getResultMapList(joinRequestDto);
+    }
+
+    public List<Map<String, String>> getRightFullJoinResults(JoinRequestDto joinRequestDto) {
+        return getResultMapList(joinRequestDto);
+    }
+
+    private List<Map<String, String>> getResultMapList(JoinRequestDto joinRequestDto) {
+        List<Map<String, String>> results = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()){
+            PreparedStatement preparedStatement = connection.prepareStatement(makeJoinQuery(joinRequestDto));
+            ResultSet resultSet = preparedStatement.executeQuery();
+            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
+            int columnCount = resultSetMetaData.getColumnCount();
+            while (resultSet.next()) {
+                Map<String, String> rowValue = new HashMap<>();
+                for (int i = 1; i <= columnCount; i++) {
+                    rowValue.put(resultSetMetaData.getColumnLabel(i), resultSet.getString(i));
+                }
+                results.add(rowValue);
+            }
+            resultSet.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            System.out.println("error!");
+        }
+        return results;
     }
 
     private String makeJoinQuery(JoinRequestDto joinRequestDto) {
         StringBuilder query = new StringBuilder();
-        query.append()
+        if (joinRequestDto.getSelectColumns() == null || joinRequestDto.getSelectColumns().isEmpty()) {
+            query.append("SELECT * FROM ");
+        } else {
+            query.append("SELECT ");
+            joinRequestDto.getSelectColumns().forEach(column ->
+                    query.append("a.").append(column).append(",").append("b.").append(column).append(" ,"));
+            deleteLastChar(query);
+            query.append(" FROM ");
+        }
+        if (joinRequestDto.getJoinType() == null || joinRequestDto.getJoinType().isEmpty()) {
+            query.append(joinRequestDto.getTableName1()).append(" a , ").append(joinRequestDto.getTableName2()).append(" b");
+        } else {
+            query.append(joinRequestDto.getTableName1()).append(" a ")
+                    .append(joinRequestDto.getJoinType()).append(" ")
+                    .append(joinRequestDto.getTableName2()).append(" b ");
+        }
+
+        if (joinRequestDto.getWhereClause() != null && !joinRequestDto.getWhereClause().isEmpty()) {
+            if (joinRequestDto.getJoinType() == null || joinRequestDto.getJoinType().isEmpty()) {
+                query.append(" WHERE ");
+            } else {
+                query.append(" ON ");
+            }
+            joinRequestDto.getWhereClause().forEach(filter ->
+                    query.append("a.").append(filter.getAttribute()).append(" ")
+                            .append(filter.getComparer()).append(" b.").append(filter.getAttribute()));
+        }
+        System.out.println(query);
+        return query.toString();
     }
+
+
+
 
 
 

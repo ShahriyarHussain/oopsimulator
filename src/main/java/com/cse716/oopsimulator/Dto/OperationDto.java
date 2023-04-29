@@ -16,6 +16,9 @@ public class OperationDto {
     private List<String> columns;
 
     public String getOperation() {
+        if (operation == null) {
+            return null;
+        }
         return this.operation.toUpperCase();
     }
 }
