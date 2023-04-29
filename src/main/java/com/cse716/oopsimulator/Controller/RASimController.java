@@ -1,13 +1,14 @@
 package com.cse716.oopsimulator.Controller;
 
-import com.cse716.oopsimulator.Dto.ConditionDto;
-import com.cse716.oopsimulator.Dto.StudentDto;
+import com.cse716.oopsimulator.Dto.*;
 import com.cse716.oopsimulator.Service.RASimulatorService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/ra_simulator")
@@ -17,33 +18,25 @@ public class RASimController {
     private final RASimulatorService raSimulatorService;
 
     @GetMapping("/selection/{tableName}")
-    public ResponseEntity<List<StudentDto>> getSelectionData(@PathVariable String tableName, @RequestBody List<ConditionDto> conditions) {
+    public ResponseEntity<List<StudentDto>> getSelectionData(@PathVariable String tableName,
+                                                             @RequestBody List<ConditionDto> conditions) {
         return ResponseEntity.ok(raSimulatorService.getSelectionResult(tableName, conditions));
     }
 
-    @GetMapping("/projection")
-    public String getProjectionData(List<String> projectionAttributes) {
-        return null;
+    @GetMapping("/projection/{tableName}")
+    public ResponseEntity<List<Map<String, Object>>> getProjectionData(@PathVariable String tableName,
+                                                                       @RequestBody List<String> projectionAttributes) {
+        return ResponseEntity.ok(raSimulatorService.getProjectionResult(tableName, projectionAttributes));
     }
 
-    @GetMapping("/union")
-    public String getUnionData() {
-        return null;
-    }
-
-    @GetMapping("/difference")
-    public String getDifferenceData() {
-        return null;
-    }
-
-    @GetMapping("/intersect")
-    public String getIntersectData() {
-        return null;
+    @GetMapping("/operation")
+    public ResponseEntity<List<Map<String, Object>>> getOperationData(@RequestBody OperationDto operationDto) {
+        return ResponseEntity.ok(raSimulatorService.getOperationResult(operationDto));
     }
 
     @GetMapping("/rename")
-    public String getRenamedData() {
-        return null;
+    public ResponseEntity<ResponseDto> getRenamedData(@RequestBody RenameDto renameDto) throws SQLException {
+        return ResponseEntity.ok(raSimulatorService.alterColumnName(renameDto));
     }
 
     @GetMapping("/crossProduct")
