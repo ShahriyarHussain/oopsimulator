@@ -2,6 +2,7 @@ package com.cse716.oopsimulator.Controller;
 
 import com.cse716.oopsimulator.Service.TriggerAndClusterService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/trigger_&_cluster")
 @RequiredArgsConstructor
+@CrossOrigin
 public class TriggerAndClusterController {
 
     private final TriggerAndClusterService triggerAndClusterService;
@@ -25,9 +27,11 @@ public class TriggerAndClusterController {
         return triggerAndClusterService.createTrigger(tableName);
     }
 
+//    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/queryTableData/{tableName}")
     public ResponseEntity<List<Map<String, String>>> queryTableData(@PathVariable String tableName) {
         return ResponseEntity.ok(triggerAndClusterService.getTableDataByQuery(tableName));
+
     }
 
     @PostMapping("/createCluster/{tableName}")

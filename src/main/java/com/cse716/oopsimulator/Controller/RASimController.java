@@ -13,11 +13,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/ra_simulator")
 @RequiredArgsConstructor
+@CrossOrigin
 public class RASimController {
 
     private final RASimulatorService raSimulatorService;
 
-    @GetMapping("/selection/{tableName}")
+    @PostMapping("/selection/{tableName}")
     public ResponseEntity<List<StudentDto>> getSelectionData(@PathVariable String tableName,
                                                              @RequestBody List<ConditionDto> conditions) {
         return ResponseEntity.ok(raSimulatorService.getSelectionResult(tableName, conditions));

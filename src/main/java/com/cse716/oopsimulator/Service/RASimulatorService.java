@@ -102,10 +102,11 @@ public class RASimulatorService {
 
     private String createSelectionQuery(String tableName, List<ConditionDto> whereClause) {
         StringBuilder query = new StringBuilder("select t from ").append(tableName).append(" t ");
-        if (whereClause != null && !whereClause.isEmpty()) {
+        if (whereClause != null && !whereClause.isEmpty() && whereClause.get(0) != null) {
             query.append("WHERE ");
             whereClause.forEach(conditionDto -> query.append(conditionDto.getAttribute())
-                    .append(conditionDto.getComparer()).append(conditionDto.getValue()));
+                    .append(conditionDto.getComparer())
+                    .append("'").append(conditionDto.getValue()).append("'"));
         }
         System.out.println(query);
         return query.toString();
