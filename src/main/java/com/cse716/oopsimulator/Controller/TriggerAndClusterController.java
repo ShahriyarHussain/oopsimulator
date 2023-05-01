@@ -2,7 +2,6 @@ package com.cse716.oopsimulator.Controller;
 
 import com.cse716.oopsimulator.Service.TriggerAndClusterService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,6 +36,11 @@ public class TriggerAndClusterController {
     @GetMapping("/queryTableData/getAllTables")
     public ResponseEntity<List<String>> getAllTables() {
         return ResponseEntity.ok(triggerAndClusterService.getTableNames());
+    }
+
+    @GetMapping("/queryTableData/getDbInfo")
+    public ResponseEntity<Map<String, String>> getDbInfo() {
+        return ResponseEntity.ok(triggerAndClusterService.getDbInfo());
 
     }
 

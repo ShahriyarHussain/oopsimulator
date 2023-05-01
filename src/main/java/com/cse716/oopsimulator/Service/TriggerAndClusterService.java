@@ -1,11 +1,13 @@
 package com.cse716.oopsimulator.Service;
 
-import com.cse716.oopsimulator.Dto.StudentDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.Map;
 public class TriggerAndClusterService {
 
     private final DataSource dataSource;
+    private final RASimulatorService raSimulatorService;
 
     public boolean insertData(Map<String, String> values, String tableName) {
         try (Connection connection = dataSource.getConnection()) {
@@ -63,15 +66,17 @@ public class TriggerAndClusterService {
     }
 
     public List<Map<String, String>> getTableDataByQuery(String tableName) {
-        List<Map<String, String>> results = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection()) {
+        try {
             String triggerQuery = "SELECT * FROM " + tableName;
-            PreparedStatement preparedStatement = connection.prepareStatement(triggerQuery);
-            RASimulatorService.getResultMapFromPreparedStatement(results, preparedStatement);
+            return raSimulatorService.getQueryResultMapFromQueryString(triggerQuery);
         } catch (SQLException e) {
-            System.out.println("Error!" + e.getMessage());
+            System.out.println("[ERROR]: RASimulatorService.getResultMapFromPreparedStatement: " + e.getMessage());
+//            throw new BadResultException(e.getMessage());
+        } catch (Exception e) {
+            System.out.println("[ERROR]: RASimulatorService.getResultMapFromPreparedStatement: " + e.getMessage());
+//            throw new ServerErrorException(e.getMessage());
         }
-        return results;
+        return new ArrayList<>();
     }
 
     public boolean createCluster(String tableName) {
@@ -103,6 +108,21 @@ public class TriggerAndClusterService {
             System.out.println("Error!" + e.getMessage());
         }
         return results;
+    }
+
+    public Map<String, String> getDbInfo() {
+        try (Connection connection = dataSource.getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT substr(version(), 1, 69)");
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                return Map.of("version", resultSet.getString(1));
+            }
+            resultSet.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            System.out.println("Error!" + e.getMessage());
+        }
+        return new HashMap<>();
     }
 
 }
