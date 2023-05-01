@@ -34,6 +34,12 @@ public class TriggerAndClusterController {
 
     }
 
+    @GetMapping("/queryTableData/getAllTables")
+    public ResponseEntity<List<String>> getAllTables() {
+        return ResponseEntity.ok(triggerAndClusterService.getTableNames());
+
+    }
+
     @PostMapping("/createCluster/{tableName}")
     public boolean createCluster(@PathVariable String tableName) {
         return triggerAndClusterService.createCluster(tableName);

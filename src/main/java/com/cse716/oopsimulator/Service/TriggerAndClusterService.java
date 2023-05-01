@@ -67,18 +67,7 @@ public class TriggerAndClusterService {
         try (Connection connection = dataSource.getConnection()) {
             String triggerQuery = "SELECT * FROM " + tableName;
             PreparedStatement preparedStatement = connection.prepareStatement(triggerQuery);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            ResultSetMetaData resultSetMetaData = resultSet.getMetaData();
-            int columnCount = resultSetMetaData.getColumnCount();
-            while (resultSet.next()) {
-                Map<String, String> rowValue = new HashMap<>();
-                for (int i = 1; i <= columnCount; i++) {
-                    rowValue.put(resultSetMetaData.getColumnLabel(i), resultSet.getString(i));
-                }
-                results.add(rowValue);
-            }
-            resultSet.close();
-            preparedStatement.close();
+            RASimulatorService.getResultMapFromPreparedStatement(results, preparedStatement);
         } catch (SQLException e) {
             System.out.println("Error!" + e.getMessage());
         }
@@ -87,7 +76,7 @@ public class TriggerAndClusterService {
 
     public boolean createCluster(String tableName) {
         try (Connection connection = dataSource.getConnection()) {
-            String triggerQuery = "CLUSTER" + tableName + " USING " + tableName + "_pkey;";
+            String triggerQuery = "CLUSTER" + tableName + " USING " + tableName + "_pkey";
             PreparedStatement preparedStatement = connection.prepareStatement(triggerQuery);
             preparedStatement.executeUpdate();
             preparedStatement.close();
@@ -97,4 +86,23 @@ public class TriggerAndClusterService {
         }
         return true;
     }
+
+    public List<String> getTableNames() {
+        List<String> results = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection()) {
+            String triggerQuery = "SELECT tablename FROM pg_catalog.pg_tables where tableowner = 'appdb'";
+            PreparedStatement preparedStatement = connection.prepareStatement(triggerQuery);
+            ResultSet resultSet = preparedStatement.executeQuery();
+
+            while (resultSet.next()) {
+                results.add(resultSet.getString(1));
+            }
+            resultSet.close();
+            preparedStatement.close();
+        } catch (SQLException e) {
+            System.out.println("Error!" + e.getMessage());
+        }
+        return results;
+    }
+
 }
