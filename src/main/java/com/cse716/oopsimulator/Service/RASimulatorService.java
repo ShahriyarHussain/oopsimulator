@@ -90,7 +90,7 @@ public class RASimulatorService {
     }
 
     //TODO: Requires Refactoring To Meet Clean Coding Method Size
-    private List<Map<String, String>> getQueryResultMapFromQueryString(String query) throws Exception {
+    public List<Map<String, String>> getQueryResultMapFromQueryString(String query) throws Exception {
         Connection connection = dataSource.getConnection();
         PreparedStatement preparedStatement = connection.prepareStatement(query);
         List<Map<String, String>> results = new ArrayList<>();
