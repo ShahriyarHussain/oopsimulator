@@ -1,5 +1,6 @@
 package com.cse716.oopsimulator.Service;
 
+import com.cse716.oopsimulator.Dto.TriggerDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class TriggerAndClusterService {
             PreparedStatement preparedStatement = connection.prepareStatement(query);
             preparedStatement.executeUpdate();
             preparedStatement.close();
+            System.out.println(query);
         } catch (SQLException e) {
             System.out.println("Error!" + e.getMessage());
             return false;
@@ -49,15 +51,16 @@ public class TriggerAndClusterService {
         return query.toString();
     }
 
-    public boolean createTrigger(String tableName) {
+    public boolean createTrigger(TriggerDto triggerDto) {
         try (Connection connection = dataSource.getConnection()) {
-            String triggerQuery = "CREATE TRIGGER " + tableName + "save_entry " +
+            String triggerQuery = "CREATE TRIGGER " + triggerDto.getTriggerName() + " " +
                     "BEFORE INSERT " +
-                    "ON  " + tableName + " " +
+                    "ON  " + triggerDto.getTableName() + " " +
                     "EXECUTE PROCEDURE save_insert_record()";
             PreparedStatement preparedStatement = connection.prepareStatement(triggerQuery);
             preparedStatement.executeUpdate();
             preparedStatement.close();
+            System.out.println(triggerQuery);
         } catch (SQLException e) {
             System.out.println("Error!" + e.getMessage());
             return false;
@@ -81,10 +84,11 @@ public class TriggerAndClusterService {
 
     public boolean createCluster(String tableName) {
         try (Connection connection = dataSource.getConnection()) {
-            String triggerQuery = "CLUSTER" + tableName + " USING " + tableName + "_pkey";
+            String triggerQuery = "CLUSTER " + tableName + " USING " + tableName + "_pkey";
             PreparedStatement preparedStatement = connection.prepareStatement(triggerQuery);
             preparedStatement.executeUpdate();
             preparedStatement.close();
+            System.out.println(triggerQuery);
         } catch (SQLException e) {
             System.out.println("Error!" + e.getMessage());
             return false;

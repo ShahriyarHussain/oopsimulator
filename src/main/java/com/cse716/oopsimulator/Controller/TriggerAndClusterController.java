@@ -1,5 +1,6 @@
 package com.cse716.oopsimulator.Controller;
 
+import com.cse716.oopsimulator.Dto.TriggerDto;
 import com.cse716.oopsimulator.Service.TriggerAndClusterService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -21,12 +22,11 @@ public class TriggerAndClusterController {
         return triggerAndClusterService.insertData(values, tableName);
     }
 
-    @PostMapping("/createTrigger/{tableName}")
-    public boolean createTrigger(@PathVariable String tableName) {
-        return triggerAndClusterService.createTrigger(tableName);
+    @PostMapping("/createTrigger")
+    public boolean createTrigger(@RequestBody TriggerDto triggerDto) {
+        return triggerAndClusterService.createTrigger(triggerDto);
     }
 
-//    @CrossOrigin(origins = "http://localhost:3000")
     @GetMapping("/queryTableData/{tableName}")
     public ResponseEntity<List<Map<String, String>>> queryTableData(@PathVariable String tableName) {
         return ResponseEntity.ok(triggerAndClusterService.getTableDataByQuery(tableName));
